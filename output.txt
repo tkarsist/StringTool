@@ -1,0 +1,4 @@
+John Smith |1|	John Smithi |1|
+John Smithi |1|	John Smith |1|
+Smith J john |1|	Smith John |1|
+Smith John |1|	Smith J john |1|
