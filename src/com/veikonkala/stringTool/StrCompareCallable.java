@@ -11,17 +11,19 @@ public class StrCompareCallable implements Callable<Map<String,ArrayList<String>
 	private int algorithm;
 	private double similarity;
 	private int swappingDepth;
+	boolean withNumbers;
 	private HashMap<String,Integer> compareMap;
 	private HashSet<String> keySet;
 	//private Map<String,ArrayList<String>> duplicateMap;
 
 
-	public StrCompareCallable(HashSet<String> keySet, HashMap<String, Integer> compareMap, int algorithm, double similarity, int swappingDepth){
+	public StrCompareCallable(HashSet<String> keySet, HashMap<String, Integer> compareMap, int algorithm, double similarity, int swappingDepth, boolean withNumbers){
 		this.compareMap=compareMap;
 		this.keySet=keySet;
 		this.algorithm=algorithm;
 		this.similarity=similarity;
 		this.swappingDepth=swappingDepth;
+		this.withNumbers=withNumbers;
 		//this.duplicateMap=new HashMap<String,ArrayList<String>>();
 	}
 
@@ -50,7 +52,10 @@ public class StrCompareCallable implements Callable<Map<String,ArrayList<String>
 
 					}
 					if(sim>=this.similarity){
-						doubles.add(compareStr+" |"+this.compareMap.get(compareStr).toString()+"|");
+						if(withNumbers)
+							doubles.add(compareStr+" |"+this.compareMap.get(compareStr).toString()+"|");
+						else
+							doubles.add(compareStr);
 					}
 					 
 
@@ -59,7 +64,10 @@ public class StrCompareCallable implements Callable<Map<String,ArrayList<String>
 			}
 			
 			if(!doubles.isEmpty()){
-				duplicateMap.put(keyStr+" |"+this.compareMap.get(keyStr).toString()+"|", doubles);
+				if(withNumbers)
+					duplicateMap.put(keyStr+" |"+this.compareMap.get(keyStr).toString()+"|", doubles);
+				else
+					duplicateMap.put(keyStr, doubles);
 				//System.out.println(keyStr+" "+doubles);
 
 			}	  
