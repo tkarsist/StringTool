@@ -82,7 +82,8 @@ public class duplicateStringAnalyzer {
 					
 					for(int i=1;i<(splitArray.length);i++){
 						String key=splitInputWord(splitArray[i]);
-						this.resolvedDuplicateMap.put(key, value);
+						if(!key.equals("")&&!value.equals(""))
+							this.resolvedDuplicateMap.put(key, value);
 					}
 
 				}
@@ -114,7 +115,8 @@ public class duplicateStringAnalyzer {
 					String lineStr=line.toString();
 					if(!this.resolvedDuplicateMap.containsKey(lineStr)){
 						Integer freq = this.uniqueMap.get(lineStr);
-						this.uniqueMap.put(lineStr, (freq == null) ? 1 : freq + 1);
+						if(!lineStr.equals(""))
+							this.uniqueMap.put(lineStr, (freq == null) ? 1 : freq + 1);
 					}
 					else{
 						Integer freq = uniqueMap.get(this.resolvedDuplicateMap.get(lineStr));
@@ -130,7 +132,8 @@ public class duplicateStringAnalyzer {
 						if(splitArray.length > 6 && splitArray[6] != null && splitArray[6] != ""){
 							if(!this.resolvedDuplicateMap.containsKey(splitArray[6])){
 								Integer freq = this.uniqueMap.get(splitArray[6]);
-								this.uniqueMap.put(splitArray[6], (freq == null) ? 1 : freq + 1);
+								if(!splitArray[6].equals(""))
+									this.uniqueMap.put(splitArray[6], (freq == null) ? 1 : freq + 1);
 							}
 							else{
 								Integer freq = this.uniqueMap.get(this.resolvedDuplicateMap.get(splitArray[6]));
@@ -141,7 +144,8 @@ public class duplicateStringAnalyzer {
 						if(splitArray.length > 7 && splitArray[7] != null && splitArray[7] != ""){
 							if(!this.resolvedDuplicateMap.containsKey(splitArray[7])){
 								Integer freq = this.uniqueMap.get(splitArray[7]);
-								this.uniqueMap.put(splitArray[7], (freq == null) ? 1 : freq + 1);
+								if(!splitArray[6].equals(""))
+									this.uniqueMap.put(splitArray[7], (freq == null) ? 1 : freq + 1);
 							}
 							else{
 								Integer freq = this.uniqueMap.get(this.resolvedDuplicateMap.get(splitArray[7]));
@@ -247,6 +251,13 @@ public class duplicateStringAnalyzer {
 
 		
 	}
+	
+	public void doAll(){
+		this.readResolvedDuplicateMapFromFile();
+		this.readUniqueKeysMapFromFile();
+		this.analyzeUniqueKeysForPotentialDuplicates();
+		this.writeAllResultsToFiles();
+	}
 
 	private void generateOrderedFrequencyLimitedUniqueWordsMap(){
 
@@ -277,6 +288,8 @@ public class duplicateStringAnalyzer {
 	}
 
 	public TreeMap<String,Integer> getOrderedUniqueWordsMap(){
+		if(this.uniqueWordsMap.size()==0)
+			this.generateOrderedUniqueWordsMap();
 		return (TreeMap<String, Integer>) this.uniqueWordsMap;
 	}
 	public TreeMap<String,ArrayList<String>> getPotentialDuplicateMap(){
@@ -335,7 +348,7 @@ public class duplicateStringAnalyzer {
 		this.outHashFile=file;
 	}
 
-	public void setOutUniqueWordsFile(String file){
+	public void setOutPutUniqueWordsFile(String file){
 		this.outUniqueFile=file;
 	}
 

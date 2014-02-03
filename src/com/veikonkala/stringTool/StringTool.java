@@ -157,6 +157,8 @@ public class StringTool {
 		}
 		analyzer.setSeparator("\t");
 		analyzer.setInputOutputWithNumbers(true);
+		
+		//altenative to these for is .doAll()
 		analyzer.readResolvedDuplicateMapFromFile();
 		analyzer.readUniqueKeysMapFromFile();
 		analyzer.analyzeUniqueKeysForPotentialDuplicates();
