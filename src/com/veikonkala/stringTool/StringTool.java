@@ -92,6 +92,10 @@ public class StringTool {
 				analyzer.setCustomInputFormat(customTSV);
 				System.out.println("Custom TSV format defined ");
 			}
+			if(args[i].equals("--noFrequency")){
+				analyzer.setInputOutputWithNumbers(false);
+				System.out.println("No frequency handling in use");
+			}
 		}
 		if (args.length<1){
 			System.out.println("StringTool");
@@ -131,6 +135,8 @@ public class StringTool {
 			System.out.println(" -separator         : The separator for input & output files, Default is tab");
 			System.out.println(" -inputFileColumn   : The unique words will be read from column. Separator is the same as defined.");
 			System.out.println("                      Define integer value to set the column, e.g. 8 would column 8.");
+			System.out.println(" --noFrequency      : The output file is without frequencies. Note: there can be no frequencies");
+			System.out.println("                      in the resolved duplicated file (-d option).");
 			System.out.println(" --customFormat     :Uses the custom TSV and 2013 & 2014. Otherwise just flat file with word per line");
 			System.out.println("");
 			System.out.println("EXAMPLE USAGE:");
