@@ -1,0 +1,54 @@
+boakäärmeet	1
+Daniel Jackson	3
+Elefantti	1
+Etelänlepakko (Eptesicus serotinus)	8
+fretti	1
+Goo	1
+hahahaha	1
+Isolepakko (Nyctalus noctula)	8
+Isoviiksisiippa (Myotis brandtii)	8
+Jackson	1
+John Smith	1
+John Smithi	1
+kesyhiiri	1
+kesykani	1
+kesyrotta	1
+Kiinankääpiötulilisko	1
+kilpikonnat	1
+Kimolepakko (Vespertilio murinus)	8
+Kirahvi	1
+kissa	1
+koira	1
+Korvayökkö (Plecotus auritus)	8
+kotisirkka	1
+kskkskks	1
+ksksksk	1
+kultahamsteri	1
+kultakala	1
+kultatöyhtökakadu	8
+Kääpiölepakko (Pipistrellus pygmaeus)	8
+lalalala	1
+Lampisiippa (Myotis dasycneme)	8
+lintuhämähäkit	1
+marsu	1
+mongoliangerbiili	1
+moo	1
+nelivarvassiili	1
+Norsu	1
+papukaijat	8
+Pikkulepakko (Pipistrellus nathusii)	8
+Pohjanlepakko (Eptesicus nilssonii)	8
+Ripsisiippa (Myotis nattereri)	8
+seeprapeippo	1
+SIMo	8
+Simo	41
+Smith J john	1
+Smith John	1
+sususu	1
+TiMo	1
+Timo	4
+tsintsilla	1
+undulaatti	8
+Vaivaislepakko (Pipistrellus pipistrellus)	8
+Vesisiippa (Myotis daubentonii)	8
+Viiksisiippa (Myotis mystacinus)	8

@@ -20,6 +20,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/*
+Most important variables:
+	resolvedDuplicateMap			hashmap<String,String>					Resolved duplicates from file (format: wrong_key, correctkey)
+	uniqueMap 							hashmap<String,String>					Unique values, resolved duplicates accounted with the correct key (format:key,frequency)
+	duplicateMap 					treemap<String,Arraylist<String>>		Analysis of potetial duplicates left (the resolved are left out). Format: WORD {SYNONYM_1,SYNONUM_N}
+	uniqueWordsMap					treemap<String,String>					Same as map, but a treemap. This is only for the sorting
+	uniqueWordsMapLimited			treemap<String,String>					Same as uniqueWorsMap but this list is filtered to have only at least minWords occurences of the tags
+
+
+*/
+
+
+
 public class duplicateStringAnalyzer {
 	private static final int NTHREDS = Runtime.getRuntime().availableProcessors();
 	private String inFile;
@@ -35,12 +48,18 @@ public class duplicateStringAnalyzer {
 	private boolean customTSV;
 	private String separator;
 	private boolean inputWithNumbers;
+	private int inputFileColumn;
 	private Map <String, String> resolvedDuplicateMap; 
 	private Map <String, ArrayList<String>> duplicateMap;
 	private Map <String, Integer> uniqueMap;
 	private Map <String, Integer> uniqueWordsMap;
 	private Map <String, Integer> uniqueWordsMapLimited;
 
+	
+	public duplicateStringAnalyzer(){
+		this("","");
+	}
+	
 	public duplicateStringAnalyzer(String inFile, String outFile){
 		this.inFile=inFile;
 		this.outFile=outFile;
@@ -55,6 +74,7 @@ public class duplicateStringAnalyzer {
 		this.customTSV=false;
 		this.separator="\t";
 		this.inputWithNumbers=true;
+		this.inputFileColumn=-1;
 		this.resolvedDuplicateMap = new HashMap<String,String>();
 		this.duplicateMap=new TreeMap<String,ArrayList<String>>(new customComparator()); //do not put case insensitive order, it will lose some keys
 		this.uniqueMap=new HashMap<String,Integer>();
@@ -68,6 +88,17 @@ public class duplicateStringAnalyzer {
 	}
 
 	public void addFromFileToResolvedDuplicateMap(String file){
+		/*
+		Reads the resolved duplicates. There will be excluded from the results. You can check the results by this
+		This will read the resolved file (format: CORRECT_WORD |FREQ| WRONG_WORD_1 |FREQ| ... WRONG_WORD_N |FREQ|
+		It will create hashmap of format: WRONG_WORD (key), CORRECT_WORD (value)
+		Example (resolvedDuplicateMap):
+				atuomobile  Automobile
+				automobile  Automobile
+				autommobile Automobile
+
+		 */
+
 		try {
 			BufferedReader inDupl=new BufferedReader(new FileReader(file));
 			String line;
@@ -102,6 +133,21 @@ public class duplicateStringAnalyzer {
 	}
 	
 	public void addFromFileToUniqueKeysMap(String file){
+		/*
+		Read all words/tags for file and calculate frequencies for unique entries. It will skip the entries in the duplicate file (already handled)
+	 	The map generated is hashmap of key, frequency (the key is the tag and frequency is how many times it occurs)
+	 	This block also evaluates the resolved duplicates (resolvedDuplicateMap). If it will find that the tag is in the duplicate map, then it will
+	 	put the tag to the correct tag.
+	 	Example (duplicate file): Automobile |4| atuomobile |2| automobile |1| (the numbers in this file does not matter, it will calculate the frequencies 
+	 	from the actual input file
+
+	 	Example (map):
+	 	Cat 13
+	 	Car 14
+	 	Automobile 7 (note that it will not add the wrong tags, insted it will combile and add the frequencies to the "correct tag"
+
+	 */
+		
 		int allArticleCounter=0;
 		int articleInScopeCounter=0;
 
@@ -113,6 +159,10 @@ public class duplicateStringAnalyzer {
 
 				if(!this.customTSV){ //in normal mode, no custom format
 					String lineStr=line.toString();
+					if(this.inputFileColumn>-1){
+						String splitArray[] = line.split(this.separator);
+						lineStr=splitArray[this.inputFileColumn-1];
+					}
 					if(!this.resolvedDuplicateMap.containsKey(lineStr)){
 						Integer freq = this.uniqueMap.get(lineStr);
 						if(!lineStr.equals(""))
@@ -126,7 +176,7 @@ public class duplicateStringAnalyzer {
 				}
 				else{
 					String splitArray[] = line.split("\t");
-					if(splitArray.length > 3 && splitArray[3] != null && (splitArray[3].contains("2014")||splitArray[3].contains("2013")||splitArray[3].contains("2013"))){
+					if(splitArray.length > 5 && splitArray[5] != null && (splitArray[5].contains("2014")||splitArray[5].contains("2013")||splitArray[3].contains("2013"))){
 						articleInScopeCounter+=1;
 
 						if(splitArray.length > 6 && splitArray[6] != null && splitArray[6] != ""){
@@ -172,6 +222,22 @@ public class duplicateStringAnalyzer {
 
 	}
 	public void analyzeUniqueKeysForPotentialDuplicates(){
+		
+		/*
+		  This will find similar words. It can use tree different algorithms:
+		  - Modified Levenshtein: Return 0-1.0 value how close the words are
+		  - Word order swapping (for strings that have spaces). E.g. "Jarkko Ruutu" is almost the same as "Ruutu Jarkko"
+		  - Letterpair matching, sometimes works better that Levenshtein
+
+		 This will output duplicateMap of format (it is a treemap, so it is in human readable alphabetical order):
+		 WORD {SYNONYM_1,...,SYNONYM_N}
+
+		 The duplicateMap is having the potential duplicates, user needs to take the correct duplicates and put in separate file. This map is
+		 written in the output file.
+		 Note: All possible word combinations are in the list (all keys with all synonyms)
+		 */
+
+		
 		System.out.println("Starting duplicate analysis : ");
 
 		ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
@@ -325,6 +391,10 @@ public class duplicateStringAnalyzer {
 
 	public void setInputFile(String file){
 		this.inFile=file;
+	}
+	
+	public void setInputFileColumn(int inputFileColumn){
+		this.inputFileColumn=inputFileColumn;
 	}
 	
 	public void setInputOutputWithNumbers(boolean inputWithNumbers){

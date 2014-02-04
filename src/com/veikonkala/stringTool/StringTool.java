@@ -1,100 +1,99 @@
 package com.veikonkala.stringTool;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 //import org.apache.commons.lang3.StringUtils;
 
 public class StringTool {
-	private static final int NTHREDS = Runtime.getRuntime().availableProcessors();
+	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args){
 
 
 
 		long startTime = System.currentTimeMillis();
-		String inFile="";
-		String outFile="";
-		String outHashFile="duplicateHashmap.txt";
-		String outUniqueFile="uniqueWords";
-		String resolvedDuplicateFile="";
-		double similarPercent=0;
-		int minimumTags=0;
-		int compareAlgorithm=1;
-		int wordSwappingDepth=0;
-		boolean wordSwapping=false;
-		boolean customTSV=false;
+		//String inFile="";
+		//String outFile="";
+		//String outHashFile="duplicateHashmap.txt";
+		//String outUniqueFile="uniqueWords";
+		//String resolvedDuplicateFile="";
+		//double similarPercent=0;
+		//int minimumTags=0;
+		//int compareAlgorithm=1;
+		//int wordSwappingDepth=0;
+		//boolean wordSwapping=false;
+		//boolean customTSV=false;
 
-		
+		duplicateStringAnalyzer analyzer=new duplicateStringAnalyzer();
 
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("-i") && args[i+1]!=null){
-
-				inFile=args[i+1];
-				System.out.println("Infile: " +inFile);
+				
+				analyzer.setInputFile(args[i+1]);
+				System.out.println("Infile: " +args[i+1]);
 
 			}
 			if(args[i].equals("-o") && args[i+1]!=null){
-				outFile=args[i+1];
-				System.out.println("Outfile (list of potential duplicates): " +outFile);
+				analyzer.setOutputPotentialDuplicateFile(args[i+1]);
+				System.out.println("Outfile (list of potential duplicates): " +args[i+1]);
 
 			}
 			if(args[i].equals("-d") && args[i+1]!=null){
-				resolvedDuplicateFile=args[i+1];
-				System.out.println("Resolved Duplicate File: " +resolvedDuplicateFile);
+				analyzer.setInputResolvedDuplicateFile(args[i+1]);
+				System.out.println("Resolved Duplicate File: " +args[i+1]);
 
 
 			}
 			if(args[i].equals("-similarity") && args[i+1]!=null){
-				similarPercent=Double.parseDouble(args[i+1]);
-				System.out.println("Similarity set to: " +similarPercent);
+				double similarity=Double.parseDouble(args[i+1]);
+				analyzer.setSimilarity(similarity);
+				System.out.println("Similarity set to: " +similarity);
 
 			}
+			
+			if(args[i].equals("-separator") && args[i+1]!=null){
+				analyzer.setSeparator(args[i+1]);
+				System.out.println("Separator set to: word1" +args[i+1]+"word2");
+
+			}
+			
 			if(args[i].equals("-minWords") && args[i+1]!=null){
-				minimumTags=Integer.parseInt(args[i+1]);
+				int minimumTags=Integer.parseInt(args[i+1]);
+				analyzer.setMinimumWords(minimumTags);
 				System.out.println("minWords set to: " +minimumTags);
 			}
 			if(args[i].equals("--wordSwapping")){
-				wordSwapping=true;
+				boolean wordSwapping=true;
+				analyzer.setWordSwapping(wordSwapping);
 				//compareAlgorithm=3;
 				System.out.println("Wordswapping enabled ");
 			}
-			if(wordSwapping && args[i].equals("-wordSwappingDepth") && args[i+1]!=null){
-				wordSwappingDepth=Integer.parseInt(args[i+1]);
+			if(args[i].equals("-wordSwappingDepth") && args[i+1]!=null){
+				int wordSwappingDepth=Integer.parseInt(args[i+1]);
+				analyzer.setWordSwappingDepth(wordSwappingDepth);
 				System.out.println("wordSwappingDepth set to: " +wordSwappingDepth);
 			}
+			if(args[i].equals("-inputFileColumn") && args[i+1]!=null){
+				int inputFileColumn=Integer.parseInt(args[i+1]);
+				analyzer.setInputFileColumn(inputFileColumn);
+				System.out.println("InputFileColumn set to: " +inputFileColumn);
+			}
+
 			if(args[i].equals("--humanLikeCompare")){
-				compareAlgorithm=2;
+				int compareAlgorithm=2;
+				analyzer.setCompareAlgorithm(compareAlgorithm);
 				System.out.println("Human like lightweight compare in use");
 			}
 			if(args[i].equals("--customFormat")){
-				customTSV=true;
+				boolean customTSV=true;
+				analyzer.setCustomInputFormat(customTSV);
 				System.out.println("Custom TSV format defined ");
 			}
 		}
-		if (inFile=="" || outFile==""){
+		if (args.length<1){
 			System.out.println("StringTool");
 			System.out.println("The tool finds potential duplicate words based on custom Levenstein algorithm.");
 			System.out.println("The duplicates can be resolved by taking the 'correct' lines from the output of");
@@ -115,7 +114,7 @@ public class StringTool {
 			System.out.println("  uniqueWords_MIN_X_INTANCES.txt");
 			System.out.println("- file of unique tags with at less than X-1 occurences of word (negation): ");
 			System.out.println("  uniqueWords_MAX_X-1_INTANCES.txt");
-			System.out.println("- hashMap file based on the resolved duplicate file (-d). The structure of");
+			System.out.println("- duplicateHashhMap file based on the resolved duplicate file (-d). The structure of");
 			System.out.println("  the file is: wrongKey correctKey");
 			System.out.println("");
 			System.out.println(" Usage:");
@@ -128,12 +127,20 @@ public class StringTool {
 			System.out.println(" -minWords          :The tool will generate file that has by default at least 3 instances. Integer.");
 			System.out.println(" --wordSwapping     :The tool will try to swap the order of words in string (default 4 words), using space as separator. SLOW!");
 			System.out.println(" -wordSwappingDepth :Depth for word swapping, integer value");
-			System.out.println(" --customFormat     :Uses the custom TSV and 2013 & 2014. Otherwise just flat file with word per line");
 			System.out.println(" --humanLikeCompare :Alternative compare algorithm. Lightweight, human like, more sensitive");
-
+			System.out.println(" -separator         : The separator for input & output files, Default is tab");
+			System.out.println(" -inputFileColumn   : The unique words will be read from column. Separator is the same as defined.");
+			System.out.println("                      Define integer value to set the column, e.g. 8 would column 8.");
+			System.out.println(" --customFormat     :Uses the custom TSV and 2013 & 2014. Otherwise just flat file with word per line");
+			System.out.println("");
+			System.out.println("EXAMPLE USAGE:");
+			System.out.println("java -jar StringTool.jar -i unitTest.txt -o output.txt -d unitTestResolved.txt --humanLikeCompare " +
+					"-similarity 0.90 -separator ; -inputFileColumn 3 -wordSwappingDepth 3 --wordSwapping");
+			
 			System.exit(0);
 		}
-		duplicateStringAnalyzer analyzer=new duplicateStringAnalyzer(inFile,outFile);
+		analyzer.doAll();
+/*		
 		if(!resolvedDuplicateFile.equals("")){
 			analyzer.setInputResolvedDuplicateFile(resolvedDuplicateFile);
 		}
@@ -157,12 +164,15 @@ public class StringTool {
 		}
 		analyzer.setSeparator("\t");
 		analyzer.setInputOutputWithNumbers(true);
-		
+	*/	
 		//altenative to these for is .doAll()
+		
+		/*
 		analyzer.readResolvedDuplicateMapFromFile();
 		analyzer.readUniqueKeysMapFromFile();
 		analyzer.analyzeUniqueKeysForPotentialDuplicates();
 		analyzer.writeAllResultsToFiles();
+		*/
 		
 		long endTime = System.currentTimeMillis();
 		long spentTime = endTime - startTime;
@@ -170,16 +180,6 @@ public class StringTool {
 		
 		
 
-		/*
-		 Most important variables:
-			resolvedDuplicateMap			hashmap<String,String>					Resolved duplicates from file (format: wrong_key, correctkey)
-			uniqueMap 							hashmap<String,String>					Unique values, resolved duplicates accounted with the correct key (format:key,frequency)
-			duplicateMap 					treemap<String,Arraylist<String>>		Analysis of potetial duplicates left (the resolved are left out). Format: WORD {SYNONYM_1,SYNONUM_N}
-			uniqueWordsMap					treemap<String,String>					Same as map, but a treemap. This is only for the sorting
-			uniqueWordsMapLimited			treemap<String,String>					Same as uniqueWorsMap but this list is filtered to have only at least minWords occurences of the tags
-
-
-		 */
 
 
 

@@ -1,0 +1,4 @@
+col1;col2;col3
+column1;column2;column3
+Column1;Column2;Column3
+ColumN1;ColumN2;ColumN3
