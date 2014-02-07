@@ -114,6 +114,7 @@ public class customAnalyserMain {
 		duplicateStringAnalyzer analyzer=new duplicateStringAnalyzer("viihde_meta.tsv","potential_duplicates_2013_2014");
 		duplicateStringAnalyzer analyzer2=new duplicateStringAnalyzer("all_tags.txt","all_tags_temp_output.txt");
 		duplicateStringAnalyzer analyzer3=new duplicateStringAnalyzer("unique_tags_All_Tags_MIN_13_INSTANCES.txt","potential_duplicates_for_all_at_least_13.txt");
+		analyzer3.setInputFileColumn(1);
 		
 		if(!resolvedDuplicateFile.equals("")){
 			analyzer.setInputResolvedDuplicateFile(resolvedDuplicateFile);

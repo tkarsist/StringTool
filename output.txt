@@ -1,8 +1,0 @@
-John Smith |1|	Smith J john |1|	John Smithi |1|	Smith John |1|
-John Smithi |1|	John Smith |1|	Smith J john |1|	Smith John |1|
-Simo |41|	SIMo |8|
-SIMo |8|	Simo |41|
-Smith J john |1|	John Smith |1|	John Smithi |1|	Smith John |1|
-Smith John |1|	John Smith |1|	Smith J john |1|	John Smithi |1|
-TiMo |1|	Timo |4|
-Timo |4|	TiMo |1|
